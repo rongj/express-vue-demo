@@ -1,0 +1,21 @@
+// 主色
+$tc: #20a0ff;
+
+// 反色
+$otc: #fff;
+
+// 字体颜色
+$txc: #333;
+
+// 深色
+$tc: #324157;
+
+// 浅色背景
+$bgc: #e4e8f1;
+
+// 设置字体
+@mixin ft($s: 14px, $c: $txc, $b: normal) {
+	color: $c;
+	font-size: $s;
+	font-weight: $b;
+}
