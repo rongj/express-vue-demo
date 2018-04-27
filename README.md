@@ -1,21 +1,21 @@
-# history
+# nodejs + vue前后端分离开发
 
-> A Node.js project
+> A demo developed build with express, vue
 
-## Build Setup
+### Build Setup
 
 ``` bash
-# install dependencies
+# 安装依赖
 npm install
 
-# serve with hot reload at localhost:8080
+# 运行客户端 localhost:8088
 npm run dev
 
-# build for production with minification
-npm run build
+# 运行服务端 localhost:3080
+npm start
 
-# build for production and view the bundle analyzer report
-npm run build --report
+# 发布
+npm run build
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+### 待补充

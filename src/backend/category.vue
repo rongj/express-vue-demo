@@ -84,20 +84,9 @@
 		},
 
 		created(){
-			this.getAllCategory();
 		},
 
 		methods: {
-			// 获取所有类别
-			getAllCategory() {
-				api.getAllCategory().then(res => {
-					if(res.data.code === 200) {
-						this.tableData = res.data.data;
-					}
-				}).catch(err => {
-					console.error(err);
-				})
-			},
 
 			// 添加类别
 			handleAdd() {
@@ -113,7 +102,6 @@
 			// 编辑类别
 			handleEdit(index, row) {
 				this.showPlateDialog = true;
-				console.log(row);
 				this.form = row;
 				this.editType = 2;
 			},
@@ -125,17 +113,6 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
-					api.deleteCategory({
-						id: row.id
-					}).then(res => {
-						if(res.data.code === 200) {
-							this.$message({
-								type: 'success',
-								message: '删除成功!'
-							});
-							this.getAllCategory();
-						}
-					}).catch(() => {});
 				})
 			},
 
@@ -148,33 +125,7 @@
 			beforeUpload(file) {},
 
 	      	handleSavePlate() {
-	      		if(this.editType === 2) {
-					api.updateCategory(this.form).then(res => {
-						if(res.data.code === 200) {
-							this.showPlateDialog = false;
-							this.$message({
-								message: '修改成功',
-								type: 'success'
-							});
-							this.getAllCategory();
-						}
-					}).catch(err => {
-						console.error(err);
-					})
-	      		} else if (this.editType === 1) {
-					api.addCategory(this.form).then(res => {
-						if(res.data.code === 200) {
-							this.showPlateDialog = false;
-							this.$message({
-								message: '添加成功',
-								type: 'success'
-							});
-							this.getAllCategory();
-						}
-					}).catch(err => {
-						console.error(err);
-					})
-	      		}
+	      		
 	      	}
 		}
 	}

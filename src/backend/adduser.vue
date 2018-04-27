@@ -40,20 +40,7 @@
 
 		methods: {
 			handleAdduser() {
-				api.register({
-					name: this.username,
-					password: this.password,
-					password_confirmation: this.passowrd2,
-					email: this.email,
-					role: this.role,
-				}).then(res => {
-					console.log(res)
-					if(res.data.code === 200) {
-						this.$message.success('添加用户成功')
-					} else {
-						this.$message.error(res.data.msg)
-					}
-				}).catch(e => {})
+
 			}
 		}
 	}

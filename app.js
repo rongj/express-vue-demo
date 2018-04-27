@@ -24,7 +24,7 @@ app.use('/', index);
 app.use('/api', api);
 
 app.use(history({
-	verbose: true,
+	verbose: true
 }));
 app.use('/admin', admin);
 
