@@ -1,6 +1,7 @@
 # nodejs + vue前后端分离开发
 
-> A demo developed build with express, vue
+> A demo developed by express, vue
+
 
 ### Build Setup
 
@@ -17,5 +18,3 @@ npm start
 # 发布
 npm run build
 ```
-
-### 待补充
