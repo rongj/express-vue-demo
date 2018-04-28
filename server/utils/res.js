@@ -1,5 +1,6 @@
 /**
  * 返回结果格式化
+ * 如果data传字符串返回msg信息,如果是键值对就返回data对象
  */
 function jsonWrite(res, code, data) {
 	var codeMsg = {
@@ -14,9 +15,9 @@ function jsonWrite(res, code, data) {
 		500: "系统异常",
 	}
 	res.json(Object.assign({
-		code: code,
-		msg: codeMsg[code]
-	}, {data}))
+		code,
+		msg: typeof data === 'string' ? data : codeMsg[code]
+	}, typeof data === 'object' ? { data } : {}))
 }
 
 module.exports = jsonWrite;
