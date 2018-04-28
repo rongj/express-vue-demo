@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var article = require('../sqlMap/article');
+var article = require('../controllers/article');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -18,7 +18,7 @@ router.get('/article/delete/:id', function(req, res, next) {
 })
 
 // 改
-router.get('/article/update/:id', function(req, res, next) {
+router.post('/article/update/:id', function(req, res, next) {
     article.updateArticle(req, res, next);
 })
 
