@@ -1,6 +1,7 @@
 /**
  * 返回结果格式化
  * 如果data传字符串返回msg信息,如果是键值对就返回data对象
+ * 通过req中是否包含callback字段,兼容jsonp请求
  */
 function jsonWrite(res, code, data) {
 	var codeMsg = {
@@ -14,10 +15,17 @@ function jsonWrite(res, code, data) {
 		406: "包含违禁词",
 		500: "系统异常",
 	}
-	res.json(Object.assign({
+	var results = Object.assign({
 		code,
 		msg: typeof data === 'string' ? data : codeMsg[code]
-	}, typeof data === 'object' ? { data } : {}))
+	}, typeof data === 'object' ? { data } : {});
+
+	// 兼容jsonp请求
+	if (res.req.query.callback) {
+		res.jsonp(results)
+	} else {
+		res.json(results)
+	}
 }
 
 module.exports = jsonWrite;

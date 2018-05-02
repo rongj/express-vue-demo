@@ -66,9 +66,16 @@ module.exports = {
 
 	// 查
 	getArticle: function (req, res, next) {
+		// console.log( '1、客户端请求url：' + req.url );
+		// console.log( '2、http版本：' + req.httpVersion );
+		// console.log( '3、http请求方法：' + req.method );
+		// console.log( '4、http请求头部' + JSON.stringify(req.headers) );
+
 		var params = req.query || req.body;
 		var pageNum = ~~params.pageNum || 1;
 		var pageSize = ~~params.pageSize || 10;
+
+		debugger
 		var totalPage;
 		pool.query(`select count(*) as sum from articles`, function (err, results) {
 			if(results) {
@@ -76,7 +83,7 @@ module.exports = {
 			}
 		})
 		// var sql = `select * from articles where id >= (select id from articles order by id limit ${pageSize*(pageNum-1)},1) limit ${pageSize}`;
-		var sql = `select title,content from articles limit ${pageSize*(pageNum-1)}, ${pageSize} `;
+		var sql = `select id,title,content from articles limit ${pageSize*(pageNum-1)}, ${pageSize}`;
 
 		pool.query(sql, function (err, results) {
 			if (results) {
