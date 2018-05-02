@@ -17,10 +17,6 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// 静态资源
-// app.use(favicon(path.join(__dirname, '../', 'favicon.ico')));
-app.use(express.static(path.join(__dirname, 'public')));
-
 // cors跨域处理
 app.use(cors());
 
@@ -49,6 +45,10 @@ app.use('/', index);
 // uncomment after placing your favicon in /public
 app.use(logger('dev'));
 app.use(cookieParser());
+
+// 静态资源
+// app.use(favicon(path.join(__dirname, '../', 'favicon.ico')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -13,4 +13,3 @@ router.use(history({ verbose: true}));
 router.use('/admin', admin);
 
 module.exports = router;
-	
