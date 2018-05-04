@@ -4,8 +4,8 @@
 
 [![express](https://img.shields.io/badge/express-^4.15.2-blue.svg?style=flat-square)](http://www.expressjs.com.cn/)
 [![nodejs](https://img.shields.io/badge/node-^6.0.0-green.svg?style=flat-square)](http://nodejs.cn/)
-[![npm](https://img.shields.io/badge/npm-^3.0.0-red.svg?style=flat-square)](http://nodejs.cn/)
-[![vue](https://img.shields.io/badge/vue-^2.5.16-brightgreen.svg?style=flat-square)](http://nodejs.cn/)
+[![npm](https://img.shields.io/badge/npm-^3.0.0-red.svg?style=flat-square)](https://www.npmjs.com/)
+[![vue](https://img.shields.io/badge/vue-^2.5.16-brightgreen.svg?style=flat-square)](https://cn.vuejs.org/)
 
 ### 目录结构
 > 基于vue-cli生成的目录结构开发,打包路径../server/public
@@ -68,6 +68,15 @@
   }
 
 ```
+
+### 实现功能
+- [x] 简单增删改查、多表联查
+- [x] 单/多文件上传、七牛云存储
+- [x] 简单登录注册
+- [] 登录注册接口
+- [] 权限控制
+- [] redis集成
+- [] 客户端多项目配置
 
 ### 开发部署
 
