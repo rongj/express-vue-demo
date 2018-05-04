@@ -122,3 +122,20 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
+
+
+/* 
+* form
+*/
+.form-control.form-file {
+	padding: 3px 12px;
+}
+.imgfile-list {
+	margin-top: 10px;
+}
+.imgfile-list img {
+	max-width: 100px;
+	border: 1px solid #e8e8e8;
+	margin-right: 10px;
+	margin-bottom: 10px;
+}

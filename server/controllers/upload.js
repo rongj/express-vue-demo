@@ -1,7 +1,8 @@
 var pool = require('../db/pool');
 var jsonWrite = require('../utils/res');
 var { getuploadPath } = require('../utils/tools');
-var path = require('path');
+var qn = require('qn');
+var config = require('../db/config');
 
 /**
  * 文件上传
@@ -47,4 +48,27 @@ module.exports = {
 			jsonWrite(res, 201)
 		}
 	},
+
+	// 上传至七牛
+	qiniuUpload: function (req, res, next) {
+		console.log(config.qiniu);
+		var qiniuClient = qn.create(config.qiniu);
+		var file = req.file;
+		if(file) {
+			let fileFormat = (req.file.originalname).split('.')
+      		// 设置上传到七牛的文件名
+      		let filePath = '/upload/' + req.file.fieldname + '-' + Date.now() + '.' + fileFormat[fileFormat.length - 1]
+			qiniuClient.upload(file.buffer, {
+				key: filePath
+			}, function (err, results) {
+				if (results) {
+					jsonWrite(res, 200, { accessUrl: config.qiniu.hosturl + filePath })
+				} else {
+					jsonWrite(res, 201, '上传失败')
+				}
+			})
+		} else {
+			jsonWrite(res, 201)
+		}
+	}
 }

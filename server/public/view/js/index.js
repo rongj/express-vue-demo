@@ -44,7 +44,8 @@ $(function() {
 			htmlTable += '<tr>'+
 					'<td>'+item.id+'</td>'+
 					'<td>'+item.title+'</td>'+
-					'<td></td>'+
+					'<td>'+item.username+'</td>'+
+					'<td><a href="article/'+item.id+'">查看</a>  <a href="article/edit/'+item.id+'">修改</a></td>'+
 				'</tr>'
 		}
 		$list.html(htmlTable)
@@ -54,5 +55,39 @@ $(function() {
 		}
 		$page.find('li[data-page="'+currPage+'"]').addClass('active')
 		$page.html(htmlPage)
+	}
+
+
+
+	/**
+	 * 表单
+	 */
+	$('.btn-upload').on('click', function (e) {
+		e.preventDefault()
+		var $form = $(this).parents('form'),
+			url = $form.attr('data-postUrl');
+		$.ajax({
+			url: url,
+			type: 'POST',
+			cache: false,
+			data: new FormData($form[0]),
+			processData: false,
+			contentType: false,
+			dataType:"json",
+			success: function (data) {
+				if(data.code === 200 && data.data) {
+					renderUploadList(data.data, $form.find('.imgfile-list'))					
+				}
+			}
+		})
+	})
+
+	function renderUploadList(data, $dom) {
+		var list = [].concat(data)
+		var html = ''
+		for (var i = 0; i < list.length; i++) {
+			html += '<img src="'+list[i].accessUrl+'" alt="" />'
+		}
+		$dom.html(html)
 	}
 })

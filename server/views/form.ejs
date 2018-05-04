@@ -2,16 +2,27 @@
 <%- include header %>
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h3 class="sub-header">文件上传</h3>
-    <form action="/api/upload/single" method="post" enctype="multipart/form-data">
-        <h6>单图上传</h6>
-        <input type="file" name="file">
-        <input type="submit" value="提交">
+    <form class="navbar-form" data-postUrl="/api/upload/single" enctype="multipart/form-data">
+        <h4>单图上传</h4>
+        <input type="file" class="form-control form-file" name="file">
+		<button class="btn btn-default btn-upload">上传</button>
+        <div class="imgfile-list"></div>
     </form>
-    
-    <form action="/api/upload/multi" method="post" enctype="multipart/form-data">
-        <h6>多图上传</h6>
-        <input type="file" name="files" multiple="multiple">
-        <input type="submit" value="提交">
+	<br>
+
+    <form class="navbar-form" data-postUrl="/api/upload/multi" enctype="multipart/form-data">
+        <h4>多图上传</h4>
+        <input type="file" class="form-control form-file" name="files" multiple="multiple">
+        <button class="btn btn-default btn-upload">上传</button>
+        <div class="imgfile-list"></div>
+    </form>
+    <br>
+	
+    <form class="navbar-form" data-postUrl="/api/upload/qiniu" enctype="multipart/form-data">
+        <h4>七牛上传</h4>
+        <input type="file" class="form-control form-file" name="qiniu">
+        <button class="btn btn-default btn-upload">上传</button>
+        <div class="imgfile-list"></div>
     </form>
 </div>
 <%- include footer %>
