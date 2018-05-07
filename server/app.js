@@ -1,5 +1,6 @@
 var express = require('express');
 var session = require('express-session');
+// var FileStore = require('session-file-store')(session)
 var path = require('path');
 // var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -18,7 +19,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // cors跨域处理
-app.use(cors());
+app.use(cors({
+	origin: 'http://localhost',
+	credentials: true
+}));
 
 // 开启gzip
 app.use(compression());
@@ -32,9 +36,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
 	secret :  'secret', // 对session id 相关的cookie 进行签名
 	resave : true,
+	// store: new FileStore(),
 	saveUninitialized: false, // 是否保存未初始化的会话
 	cookie : {
-		maxAge : 1000 * 60 * 60 * 24 * 30, // 设置 session 的有效时间，单位毫秒
+		maxAge : 1000 * 60 * 60 * 24 *30, // 设置 session 的有效时间，单位毫秒
 	},
 }));
 

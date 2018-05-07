@@ -70,12 +70,7 @@ module.exports = {
 		var params = req.query || req.body;
 		var pageNum = ~~params.pageNum || 1;
 		var pageSize = ~~params.pageSize || 10;
-		var totalPage;
-		pool.query(`select count(*) as sum from articles`, function (err, results) {
-			if(results) {
-				totalPage = Math.ceil(results[0].sum/pageSize) 
-			}
-		})
+
 		// var sql = `select * from articles where id >= (select id from articles order by id limit ${pageSize*(pageNum-1)},1) limit ${pageSize}`;
 
 		// 单表查询
@@ -95,29 +90,35 @@ module.exports = {
 				on articles.id = new_cs.article_id
 				limit ${pageSize*(pageNum-1)}, ${pageSize}`
 
-		pool.query(sql, function (err, results) {
-			if (results) {
-				// 查询文章对应评论
+		/*
+		* 获取分页和列表并行执行
+		* 列表和获取列表关联的评论串行执行
+		*/
+		async.auto({
+			// 获取页数
+			totalPage: function(cb) {
+				pool.query(`select count(*) as sum from articles`, function (err, results) {
+					if(results) {
+						var totalPage = Math.ceil(results[0].sum/pageSize) 
+ 						cb(null, totalPage)
+					}
+				})
+			},
 
-				// promise
-				// var promiseArr = []
-				// for (let i = 0; i < results.length; i++) {
-				// 	promiseArr.push(new Promise((resolve, reject) => {
-				// 		pool.query(`select comments.id, comments.c_content, users.username from comments 
-				// 			join users
-				// 			on comments.c_user_id = users.id
-				// 			where article_id = ${results[i].id}`, function (err, results2) {
-				// 			results[i].comments_list = results2
-				// 			resolve(results[i])
-				// 		})
-				// 	}))
-				// }
-				// Promise.all(promiseArr).then(results => {
-				// 	jsonWrite(res, 200, {results, totalPage})
-				// })
+			// 获取列表
+			dataList: function(cb) {
+				pool.query(sql, function (err, results) {
+					if(results) {
+						cb(null, results)
+					}
+				})
+			},
 
-				// async
-				async.map(results, function (item, cb) {
+			// 获取列表评论 依赖dataList执行完
+			comments: ['dataList', function(results, cb) {
+				var results = results.dataList;
+				// 限制同时查询五条
+				async.mapLimit(results, 5, function (item, cb) {
 					pool.query(`select comments.id, comments.c_content, users.username from comments 
 						join users
 						on comments.c_user_id = users.id
@@ -126,11 +127,104 @@ module.exports = {
 						cb(null, item);
 					})
 				}, function (err, results) {
-					jsonWrite(res, 200, {results, totalPage})
+					cb(null, results.dataList)
 				})
-			} else {
+			}]
+		}, function(err, results) {
+			if(err) {
 				jsonWrite(res, 201, err)
+			} else {
+				jsonWrite(res, 200, results)
 			}
 		})
+
+		// -------------- async await ----------
+		// function getTotalPage () {
+		// 	return new Promise(function (resolve, reject) {
+		// 		pool.query(`select count(*) as sum from articles`, function (err, results) {
+		// 			if(results) {
+		// 				totalPage = Math.ceil(results[0].sum/pageSize) 
+		// 				resolve(totalPage)
+		// 			}
+		// 		})
+		// 	})
+		// }
+
+		// function getList () {
+		// 	return new Promise(function (resolve, reject) {
+		// 		pool.query(sql, function (err, results) {
+		// 			if (results) {
+		// 				async.map(results, function (item, cb) {
+		// 					pool.query(`select comments.id, comments.c_content, users.username from comments 
+		// 						join users
+		// 						on comments.c_user_id = users.id
+		// 						where article_id = ${item.id}`, function (err, results2) {
+		// 						item.comments_list = results2
+		// 						cb(null, item);
+		// 					})
+		// 				}, function (err, results) {
+		// 					resolve(results)
+		// 				})
+		// 			}
+		// 		})
+		// 	})
+		// }
+
+		// async function returnDate () {
+		// 	var totalPage = await getTotalPage()
+		// 	var results = await getList()
+		// 	return {results, totalPage}
+		// }
+
+		// returnDate().then(function (data) {
+		// 	jsonWrite(res, 200, data)
+		// })
+		
+		// -------------- async await ----------
+
+
+		// -------------- 分开获取 ----------
+		// pool.query(`select count(*) as sum from articles`, function (err, results) {
+		// 	if(results) {
+		// 		totalPage = Math.ceil(results[0].sum/pageSize) 
+		// 	}
+		// })
+		// pool.query(sql, function (err, results) {
+		// 	if (results) {
+		// 		// 查询文章对应评论
+		// 		// promise
+		// 		// var promiseArr = []
+		// 		// for (let i = 0; i < results.length; i++) {
+		// 		// 	promiseArr.push(new Promise((resolve, reject) => {
+		// 		// 		pool.query(`select comments.id, comments.c_content, users.username from comments 
+		// 		// 			join users
+		// 		// 			on comments.c_user_id = users.id
+		// 		// 			where article_id = ${results[i].id}`, function (err, results2) {
+		// 		// 			results[i].comments_list = results2
+		// 		// 			resolve(results[i])
+		// 		// 		})
+		// 		// 	}))
+		// 		// }
+		// 		// Promise.all(promiseArr).then(results => {
+		// 		// 	jsonWrite(res, 200, {results, totalPage})
+		// 		// })
+
+		// 		// async
+		// 		async.mapLimit(results, 5, function (item, cb) {
+		// 			pool.query(`select comments.id, comments.c_content, users.username from comments 
+		// 				join users
+		// 				on comments.c_user_id = users.id
+		// 				where article_id = ${item.id}`, function (err, results2) {
+		// 				item.comments_list = results2
+		// 				cb(null, item);
+		// 			})
+		// 		}, function (err, results) {
+		// 			jsonWrite(res, 200, {results, totalPage})
+		// 		})
+		// 	} else {
+		// 		jsonWrite(res, 201, err)
+		// 	}
+		// })
+		// -------------- 分开获取 ----------
 	},
 }

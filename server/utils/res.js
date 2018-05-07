@@ -25,7 +25,7 @@ function jsonWrite(res, code, data) {
 		res.jsonp(results)
 	} else {
 		res.json(results)
-	}
+	} 
 }
 
 module.exports = jsonWrite;

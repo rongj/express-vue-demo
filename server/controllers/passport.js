@@ -8,7 +8,7 @@ module.exports = {
 		var params = req.query || req.body;
 		let { username, password } = params;
 		if(!username || !password) {
-			jsonWrite(res, 400, '账号或密码不能为空');
+			return jsonWrite(res, 400, '账号或密码不能为空');
 		}
 
 		// 查询用户是否已注册 
@@ -20,9 +20,9 @@ module.exports = {
 				var sql = `insert into users (username, password) values (?,?)`;
 				pool.queryArgs(sql, [username, encrypt(password)] , function (err, results) {
 					if (results) {
-						jsonWrite(res, 200);
+						return jsonWrite(res, 200);
 					} else {
-						jsonWrite(res, 201, err);
+						return jsonWrite(res, 201, err);
 					}
 				})
 			}
@@ -31,10 +31,11 @@ module.exports = {
 
 	// 登录
 	login: function (req, res, next) {
-		var params = req.query || req.body;
+		var params = req.body;
+		console.log(params);
 		let { username, password } = params;
 		if(!username || !password) {
-			jsonWrite(res, 400, '账号或密码不能为空');
+			return jsonWrite(res, 400, '账号或密码不能为空');
 		}
 
 		// 查询用户是否已注册 
@@ -43,12 +44,12 @@ module.exports = {
 				if(results.length && encrypt(password) === results[0].password) {
 					let { id, username } = results[0];
 					req.session.username = username;
-					jsonWrite(res, 200, { id, username });
+					return jsonWrite(res, 200, { id, username });
 				} else {
-					jsonWrite(res, 400, '账号或密码错误');
+					return jsonWrite(res, 400, '账号或密码错误');
 				} 
 			} else {
-				jsonWrite(res, 201, err);
+				return jsonWrite(res, 201, err);
 			}
 		})
 	},
@@ -56,9 +57,9 @@ module.exports = {
 	// 检测是否登录
 	checkLogin: function (req, res, next) {
 		if(req.session.username) {
-			jsonWrite(res, 200, '已登录');
+			return jsonWrite(res, 200, '已登录');
 		} else {
-			jsonWrite(res, 200, '未登录');
+			return jsonWrite(res, 200, '未登录');
 		}
 	},
 
@@ -66,9 +67,9 @@ module.exports = {
 	logout: function (req, res, next) {
 		req.session.username = null;
 		if(!req.session.username) {
-			jsonWrite(res, 200, '退出登录成功');
+			return jsonWrite(res, 200, '退出登录成功');
 		} else {
-			jsonWrite(res, 200, '退出登录失败');
+			return jsonWrite(res, 200, '退出登录失败');
 		}
 	},
 

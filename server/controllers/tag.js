@@ -15,7 +15,7 @@ module.exports = {
 				state: 'pending'
 			});
 		})
-		.then( results => {
+		.then(results => {
 			jsonWrite(res, 200, results)
 		});
 	}
