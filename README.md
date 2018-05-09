@@ -1,6 +1,8 @@
-# nodejs + vue前后端分离开发
+# nodejs + vue前后端分离开发(待完善...)
 
-> 使用express和vue开发模板
+> server: express、mysql、redis、jwt、session
+
+> client: vue、vuex、vue-router(history)、axios、element-ui
 
 [![express](https://img.shields.io/badge/express-^4.15.2-blue.svg?style=flat-square)](http://www.expressjs.com.cn/)
 [![nodejs](https://img.shields.io/badge/node-^6.0.0-green.svg?style=flat-square)](http://nodejs.cn/)
@@ -54,7 +56,7 @@
     "debug": "~2.6.3",                            # debug
     "ejs": "~2.5.6",                              # ejs模板引擎
     "express": "~4.15.2",                         # nodejs框架
-    "express-jwt": "^5.3.1",                      # 基于express的jwt库
+    "express-jwt": "^5.3.1",                      # express的jwt库
     "express-session": "^1.15.6",                 # express的session模块
     "jsonwebtoken": "^8.2.1",                     # jwt模块
     "morgan": "~1.8.1",                           # 日志记录模块
@@ -76,6 +78,7 @@
 - [x] 简单增删改查、多表联查
 - [x] 单/多文件上传、七牛云存储
 - [x] 简单登录注册
+- [x] mysql orm查询
 - [x] session-cookie登录退出
 - [x] jwt-redis的登录退出
 - [ ] 客户端多项目配置
@@ -99,7 +102,7 @@ npm run debug
 npm run build
 
 # 部署
-copy server/ & package.json
+cp server/ & package.json
 npm install --production
 pm2 start ./server/bind/www --name 'app'
 ```
