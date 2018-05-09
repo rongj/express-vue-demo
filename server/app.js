@@ -1,6 +1,6 @@
 var express = require('express');
 var session = require('express-session');
-// var FileStore = require('session-file-store')(session)
+var RedisStore = require('connect-redis')(session);
 var path = require('path');
 // var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -8,6 +8,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 var compression = require('compression');
+
+var config = require('./db/config');
 
 var index = require('./routes/web');
 var api = require('./routes/api');
@@ -20,7 +22,7 @@ app.set('view engine', 'ejs');
 
 // cors跨域处理
 app.use(cors({
-	origin: 'http://localhost',
+	origin: ['http://localhost', /\.mop\.com$/],
 	credentials: true
 }));
 
@@ -28,28 +30,45 @@ app.use(cors({
 app.use(compression());
 
 // 解析 application/json
-app.use(bodyParser.json());	
+app.use(bodyParser.json());
 // 解析 application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// 日志中间件
+app.use(logger('dev'));
+
+// cookie中间件
+app.use(cookieParser());
+
 // 使用 session 中间件
 app.use(session({
-	secret :  'secret', // 对session id 相关的cookie 进行签名
-	resave : true,
-	// store: new FileStore(),
+	secret: 'session-app', // 对session id 相关的cookie 进行签名
+	resave: true,
+	store: new RedisStore({
+		host: config.redis.host,
+		port: config.redis.port,
+		db: 1
+	}),
 	saveUninitialized: false, // 是否保存未初始化的会话
-	cookie : {
-		maxAge : 1000 * 60 * 60 * 24 *30, // 设置 session 的有效时间，单位毫秒
+	cookie: {
+		maxAge : 1000 * 60 * 10, // 设置 session 的有效时间，单位毫秒
 	},
 }));
+
+app.options('*', function (req, res, next) {
+	res.end();
+});
+
+// app.post('/test', function (req, res, next) {
+// 	res.cookie('name', req.body, { domain: 'localhost', path: '/' })
+// 	req.session.test = 'fuck qq'
+// 	res.send('成功')
+// 	// next()
+// })
 
 // 路由
 app.use('/api', api);
 app.use('/', index);
-
-// uncomment after placing your favicon in /public
-app.use(logger('dev'));
-app.use(cookieParser());
 
 // 静态资源
 // app.use(favicon(path.join(__dirname, '../', 'favicon.ico')));

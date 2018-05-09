@@ -1,4 +1,4 @@
-var jsonWrite = require('../utils/res');
+var { jsonWrite } = require('../utils/ret');
 
 module.exports = {
 	checkLogin: function (req, res, next) {

@@ -1,6 +1,6 @@
 var sequelize = require('../db/sequelize');
 var Tag = require('../models/tag');
-var jsonWrite = require('../utils/res');
+var { jsonWrite } = require('../utils/ret');
 var async = require('async');
 
 module.exports = {

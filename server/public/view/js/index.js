@@ -1,5 +1,4 @@
 $(function() {
-
 	function getQueryString(name) {
 	    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
 	    var r = window.location.search.substr(1).match(reg);
@@ -28,7 +27,7 @@ $(function() {
 	function renderArticleList(d) {
 		var $list = $('.article-list'),
 			$page = $('.article-page')
-		var list = d.results,
+		var list = d.dataList,
 			totalPage = d.totalPage
 
 		var htmlTable = '',

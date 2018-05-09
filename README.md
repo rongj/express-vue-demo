@@ -35,7 +35,7 @@
 ├─routes                # 路由
 │  ├─api                # api路由
 │  └─web                # view路由
-├─utils                 # 工具
+├─utils                 # 工具js
 └─views                 # 模板
 ```
 
@@ -47,13 +47,16 @@
     "bytes": "^3.0.0",                            # 文件大模块
     "compression": "^1.7.2",                      # 开启gzip
     "connect-history-api-fallback": "^1.5.0",     # 客户端路由开启history模式
+    "connect-redis": "^3.3.3",                    # session-redis连接
     "cookie-parser": "~1.4.3",                    # cookie
     "cors": "^2.8.4",                             # cors跨域
     "crypto": "^1.0.1",                           # 加密解密
     "debug": "~2.6.3",                            # debug
     "ejs": "~2.5.6",                              # ejs模板引擎
     "express": "~4.15.2",                         # nodejs框架
+    "express-jwt": "^5.3.1",                      # 基于express的jwt库
     "express-session": "^1.15.6",                 # express的session模块
+    "jsonwebtoken": "^8.2.1",                     # jwt模块
     "morgan": "~1.8.1",                           # 日志记录模块
     "multer": "^1.3.0",                           # 文件上传
     "mysql": "^2.15.0",                           # 使用原生mysql语句依赖
@@ -73,9 +76,8 @@
 - [x] 简单增删改查、多表联查
 - [x] 单/多文件上传、七牛云存储
 - [x] 简单登录注册
-- [ ] 登录注册接口
-- [ ] 权限控制
-- [ ] redis集成
+- [x] session-cookie登录退出
+- [x] jwt-redis的登录退出
 - [ ] 客户端多项目配置
 
 ### 开发部署

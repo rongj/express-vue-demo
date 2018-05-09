@@ -1,5 +1,5 @@
 var pool = require('../db/pool');
-var jsonWrite = require('../utils/res');
+var { jsonWrite } = require('../utils/ret');
 var { getuploadPath } = require('../utils/tools');
 var qn = require('qn');
 var config = require('../db/config');

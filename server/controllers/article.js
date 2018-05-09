@@ -1,11 +1,11 @@
 var pool = require('../db/pool');
-var jsonWrite = require('../utils/res');
+var { jsonWrite, reqData } = require('../utils/ret');
 var async = require('async');
 
 module.exports = {
 	// 增
 	createArticle: function (req, res, next) {
-		var params = req.query || req.body;
+		var params = reqData(req);
 		if(!params.title || !params.content) {
 			jsonWrite(res, 400)
 		}
@@ -35,7 +35,7 @@ module.exports = {
 	// 改
 	updateArticle: function (req, res, next) {
 		var id = req.params.id;
-		var params = req.query || req.body
+		var params = reqData(req);
 		if(!id || !params.title || !params.content) {
 			jsonWrite(res, 400)
 		}
@@ -67,9 +67,11 @@ module.exports = {
 
 	// 查
 	getArticle: function (req, res, next) {
-		var params = req.query || req.body;
+		var params = reqData(req);
 		var pageNum = ~~params.pageNum || 1;
 		var pageSize = ~~params.pageSize || 10;
+
+		console.log(req.decoded);
 
 		// var sql = `select * from articles where id >= (select id from articles order by id limit ${pageSize*(pageNum-1)},1) limit ${pageSize}`;
 
@@ -89,6 +91,11 @@ module.exports = {
 				left join (select article_id, count(c_content) as comment_num from comments GROUP BY article_id) as new_cs
 				on articles.id = new_cs.article_id
 				limit ${pageSize*(pageNum-1)}, ${pageSize}`
+
+		var sql_comment = `select comments.id, comments.c_content, users.username from comments 
+						join users
+						on comments.c_user_id = users.id
+						where article_id = ?`
 
 		/*
 		* 获取分页和列表并行执行
@@ -119,10 +126,7 @@ module.exports = {
 				var results = results.dataList;
 				// 限制同时查询五条
 				async.mapLimit(results, 5, function (item, cb) {
-					pool.query(`select comments.id, comments.c_content, users.username from comments 
-						join users
-						on comments.c_user_id = users.id
-						where article_id = ${item.id}`, function (err, results2) {
+					pool.queryArgs(sql_comment, [item.id] ,function (err, results2) {
 						item.comments_list = results2
 						cb(null, item);
 					})

@@ -28,4 +28,14 @@ function jsonWrite(res, code, data) {
 	} 
 }
 
-module.exports = jsonWrite;
+/**
+ * 获取接口请求参数 兼容reqquery和req.body
+ */
+function reqData(req) {
+	return Object.assign({}, req.query, req.body)
+}
+
+module.exports = {
+	jsonWrite,
+	reqData
+};

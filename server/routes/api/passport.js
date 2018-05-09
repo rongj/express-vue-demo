@@ -2,8 +2,6 @@ var express = require('express');
 var router = express.Router();
 var passport = require('../../controllers/passport');
 
-var cors = require('cors');
-
 /* GET home page. */
 router.get('/', function (req, res, next) {
 	res.send('passport API')
@@ -13,7 +11,7 @@ router.get('/', function (req, res, next) {
 router.post('/register', passport.register);
 
 // 登录
-router.post('/login', passport.login);
+router.all('/login', passport.login);
 
 // 检测是否登录
 router.get('/checkLogin', passport.checkLogin);

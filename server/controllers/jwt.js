@@ -1,6 +1,7 @@
 var pool = require('../db/pool');
 var { jsonWrite, reqData } = require('../utils/ret');
 var { encrypt } = require('../utils/tools');
+var { setToken, delToken } = require('../utils/jwt');
 
 module.exports = {
 	// 注册
@@ -42,8 +43,13 @@ module.exports = {
 			if (results) {
 				if(results.length && encrypt(password) === results[0].password) {
 					let { id, username } = results[0];
-					req.session.username = username;
-					return jsonWrite(res, 200, { id, username });
+					token = setToken({ 
+						username, 
+						id,
+						password: encrypt(password),
+						key: 'user'
+					}, id)
+					return jsonWrite(res, 200, { id, username, token });
 				} else {
 					return jsonWrite(res, 400, '账号或密码错误');
 				} 
@@ -55,8 +61,9 @@ module.exports = {
 
 	// 检测是否登录
 	checkLogin: function (req, res, next) {
-		if(req.session.username) {
-			return jsonWrite(res, 200, '已登录');
+		if(req.decoded.username) {
+			var { id, username } = req.decoded;
+			return jsonWrite(res, 200, { id, username });
 		} else {
 			return jsonWrite(res, 200, '未登录');
 		}
@@ -64,11 +71,17 @@ module.exports = {
 
 	// 登出
 	logout: function (req, res, next) {
-		req.session.username = null;
-		if(!req.session.username) {
-			return jsonWrite(res, 200, '退出登录成功');
+		// 删除redis中对应用户的key  即使传入token也无效需重新登录存入新的token 
+		if(req.decoded) {
+			delToken(req.decoded.id, function (err, data) {
+				if(data === 1) {
+					return jsonWrite(res, 200, '退出登录成功');
+				} else {
+					return jsonWrite(res, 200, '退出登录失败');
+				}
+			})
 		} else {
-			return jsonWrite(res, 200, '退出登录失败');
+			return jsonWrite(res, 201);
 		}
 	},
 
