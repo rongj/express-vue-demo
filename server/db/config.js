@@ -25,10 +25,10 @@ module.exports = {
 
 	// 七牛云
 	qiniu: {
-		accessKey: '1joW05X8I5nxM5clmmm2u7oxYudrva-II-uFs5Pc',
-		secretKey: 'tZWWWKgiBNrUfn0N4UdL1K8ttPeBwF_bTTb6PkOP',
-		bucket: 'load',
+		accessKey: '',
+		secretKey: '',
+		bucket: '',
 		origin: '',
-		hosturl: 'http://ozusj43jr.bkt.clouddn.com',
+		hosturl: '',
 	}
 };
