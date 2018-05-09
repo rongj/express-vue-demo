@@ -12,7 +12,7 @@
 
 ```bash
 ├─bin
-|  └─www                # 服务入口文件
+│  └─www                # 服务入口文件
 ├─controllers           # 控制器
 ├─db                    # 数据库配置
 │  ├─sql                # sql表
@@ -40,7 +40,7 @@
 ```
 
 ### 服务端依赖
-```json
+```bash
   "dependencies": {
     "async": "^2.6.0",                            # nodejs异步操作模块
     "body-parser": "~1.17.1",                     # 对post请求的请求体进行解析
