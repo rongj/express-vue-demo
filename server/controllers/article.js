@@ -55,7 +55,10 @@ module.exports = {
 		if(!id) {
 			jsonWrite(res, 400)
 		}
-		var sql = `select user_id,title,content from articles where id = ${id}`;
+		var sql = `select articles.title, content, users.username from articles
+				join users
+				on articles.user_id = users.id
+				where articles.id = ${id}`;
 		pool.query(sql, function (err, results) {
 			if (results) {
 				jsonWrite(res, 200, results[0] || '数据不存在');
@@ -70,8 +73,6 @@ module.exports = {
 		var params = reqData(req);
 		var pageNum = ~~params.pageNum || 1;
 		var pageSize = ~~params.pageSize || 10;
-
-		console.log(req.decoded);
 
 		// var sql = `select * from articles where id >= (select id from articles order by id limit ${pageSize*(pageNum-1)},1) limit ${pageSize}`;
 
@@ -106,7 +107,8 @@ module.exports = {
 			totalPage: function(cb) {
 				pool.query(`select count(*) as sum from articles`, function (err, results) {
 					if(results) {
-						var totalPage = Math.ceil(results[0].sum/pageSize) 
+						var totalCount = results[0].sum
+						var totalPage = Math.ceil(totalCount/pageSize) 
  						cb(null, totalPage)
 					}
 				})

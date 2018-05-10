@@ -22,7 +22,7 @@ app.set('view engine', 'ejs');
 
 // cors跨域处理
 app.use(cors({
-	origin: ['http://localhost', /\.mop\.com$/],
+	origin: ['http://localhost', 'http://localhost:8088', /\.mop\.com$/],
 	credentials: true
 }));
 
@@ -51,6 +51,7 @@ app.use(session({
 	}),
 	saveUninitialized: false, // 是否保存未初始化的会话
 	cookie: {
+		domain: 'localhost',
 		maxAge : 1000 * 60 * 10, // 设置 session 的有效时间，单位毫秒
 	},
 }));

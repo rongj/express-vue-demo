@@ -25,7 +25,7 @@
 </template>
 
 <script>
-	import api from '../api/api'
+	import passport from '../api/passport'
 
 	export default {
 		data() {

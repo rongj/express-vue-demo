@@ -14,8 +14,9 @@ module.exports = {
 			expiresIn: expiresIn
 		})
 		// 将jwttoken存入redis 用户id作为key
-		redisClient.set(redis_item + redis_item_key + key, token)
-		redisClient.expire(redis_item + redis_item_key + key, expiresIn)
+		var item = redis_item + redis_item_key + key
+		redisClient.set(item, token)
+		redisClient.expire(item, expiresIn)
 		return token
 	},
 

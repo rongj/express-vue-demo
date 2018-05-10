@@ -9,9 +9,6 @@ router.get('/', function (req, res, next) {
 	res.send('jwt API')
 });
 
-// 注册
-router.post('/register', jwt.register);
-
 // 登录
 router.all('/login', jwt.login);
 
@@ -20,5 +17,8 @@ router.get('/checkLogin', token.verifyToken, jwt.checkLogin);
 
 // 登出
 router.get('/logout', token.verifyToken, jwt.logout);
+
+// 修改密码
+router.all('/reset', token.verifyToken, jwt.resetPassword);
 
 module.exports = router;

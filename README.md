@@ -1,6 +1,6 @@
 # nodejs + vue前后端分离开发(待完善...)
 
-> server: express、mysql、redis、jwt、session
+> server: express、mysql、redis、jwt、multer
 
 > client: vue、vuex、vue-router(history)、axios、element-ui
 

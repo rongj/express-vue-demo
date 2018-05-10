@@ -2,34 +2,9 @@ var pool = require('../db/pool');
 var { jsonWrite, reqData } = require('../utils/ret');
 var { encrypt } = require('../utils/tools');
 var { setToken, delToken } = require('../utils/jwt');
+var async = require('async');
 
 module.exports = {
-	// 注册
-	register: function (req, res, next) {
-		var params = reqData(req);
-		let { username, password } = params;
-		if(!username || !password) {
-			return jsonWrite(res, 400, '账号或密码不能为空');
-		}
-
-		// 查询用户是否已注册 
-		pool.query(`select * from users where username = "${username}"`, function (err, results) {
-			if (results && results.length) {
-				jsonWrite(res, 201, '用户已存在');
-			} else {
-				// 插入数据库
-				var sql = `insert into users (username, password) values (?,?)`;
-				pool.queryArgs(sql, [username, encrypt(password)] , function (err, results) {
-					if (results) {
-						return jsonWrite(res, 200);
-					} else {
-						return jsonWrite(res, 201, err);
-					}
-				})
-			}
-		})
-	},
-
 	// 登录
 	login: function (req, res, next) {
 		var params = reqData(req);
@@ -84,5 +59,69 @@ module.exports = {
 			return jsonWrite(res, 201);
 		}
 	},
+
+	// 修改密码
+	resetPassword: function (req, res, next) {
+		var params = reqData(req);
+		var { username, oldpwd1, oldpwd2, newpwd } = params;
+
+		// 缺少参数
+		if(!username || !oldpwd1 || !oldpwd2 || !newpwd) {
+			return jsonWrite(res, 400);
+		}
+
+		if(oldpwd1 !== oldpwd2) {
+			return jsonWrite(res, 201, '两次输入的旧密码不一致');
+		}
+
+		if(oldpwd1 === newpwd) {
+			return jsonWrite(res, 201, '旧密码和新密码不能一样');
+		}
+
+		async.waterfall([
+			// 查找用户匹配密码是否正确
+			function (cb) {
+				pool.query(`select * from users where username = "${username}"`, function (err, results) {
+					if(results && encrypt(oldpwd1) === results[0].password) {
+						cb(null, true)
+					} else {
+						cb('账号或密码错误')
+					}
+				})
+			},
+
+			// 修改密码
+			function (arg, cb) {
+				pool.query(`update users set password = "${encrypt(newpwd)}" where username = "${username}"`, function (err, results) {
+					if(results) {
+						cb(null, results)
+					} else {
+						cb('密码修改失败')
+					}
+				})
+			},
+
+			// 删除redis中的token
+			function (arg, cb) {
+				if(arg && req.decoded) {
+					delToken(req.decoded.id, function (err, data) {
+						// token删除 不传个results
+						if(data === 1) {
+							cb(null, 'token delete success')
+						} else {
+							cb(null, 'token delete fail')
+						}
+					})
+				}
+				cb(null, arg)
+			}
+		], function (err, results) {
+			if(results) {
+				return jsonWrite(res, 200, '密码修改成功');
+			} else {
+				return jsonWrite(res, 201, err);
+			}
+		})
+	}
 
 }

@@ -11,7 +11,7 @@ router.get('/', function (req, res, next) {
 router.post('/create', article.createArticle)
 
 // 删
-router.get('/delete/:id', article.deleteArticle)
+router.post('/delete/:id', article.deleteArticle)
 
 // 改
 router.post('/update/:id', article.updateArticle)

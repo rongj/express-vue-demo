@@ -27,11 +27,25 @@ export default new Router({
 					name: 'category',
 				},
 				{
+					path: 'article',
+					component: () => import('../backend/article.vue'),
+					name: 'article',
+				},
+				{
+					path: 'articleDetail/:id',
+					component: () => import('../backend/articleDetail.vue'),
+					name: 'articleDetail',
+				},
+				{
 					path: 'addarticle',
 					component: () => import('../backend/addarticle.vue'),
 					name: 'addarticle',
 				},
 			]
+		},
+		{
+			path: '/login',
+			component: () => import('../backend/login.vue')
 		},
 		{
 			path: '*',
