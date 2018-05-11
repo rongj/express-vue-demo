@@ -1,4 +1,4 @@
-# nodejs + vue前后端分离开发(待完善...)
+# nodejs + vue前后端分离开发
 
 > server: express、mysql、redis、jwt、multer
 
@@ -81,7 +81,6 @@
 - [x] mysql orm查询
 - [x] session-cookie登录退出
 - [x] jwt-redis的登录退出
-- [ ] 客户端多项目配置
 
 ### 开发部署
 

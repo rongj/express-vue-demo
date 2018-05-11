@@ -20,7 +20,6 @@
 </template>
 
 <script>
-	import passport from '../api/passport'
 
 	export default {
 		data() {
@@ -31,22 +30,19 @@
 			}
 		},
 
-		created() {
-			console.log(this.$route);
-		},
-
 		methods: {
 			handleLogin() {
-				passport.login({
+				this.$store.dispatch('login', {
 					username: this.username,
 					password: this.password,
 					remember: this.remember
-				}).then(res => {
-					if(res.data.code === 200) {
+				})
+				.then(result => {
+					if(result.code === 200) {
 						let url = this.$route.query.redictUrl;
 						url ? location.replace(url) : this.$router.replace('/')
 					} else {
-						this.$message.error(res.data.msg)
+						this.$message.error(result.msg)
 					}
 				}).catch(e => {})
 			}

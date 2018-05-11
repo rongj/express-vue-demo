@@ -2,7 +2,7 @@
 	<div class="main-panel">
 		<el-breadcrumb separator="/" class="breadcrumb mb25">
 			<el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-			<el-breadcrumb-item :to="{ path: '/category' }">文章管理</el-breadcrumb-item>
+			<el-breadcrumb-item :to="{ path: '/article' }">文章管理</el-breadcrumb-item>
 			<el-breadcrumb-item>文章详情</el-breadcrumb-item>
 		</el-breadcrumb>
 		<div class="main-content">
@@ -15,32 +15,16 @@
 	</div>
 </template>
 <script>
-	import api_article from '../api/article'
+	import { mapState } from 'vuex'
 	export default {
-		data() {
-			return {
-				articleId: null,
-				articleDetail: {}
-			}
+		computed: {
+			...mapState(['articleDetail'])
 		},
 
 		created(){
-			this.articleId = this.$route.params.id;
-			this.getArticleDetail()
-		},
-
-		methods: {
-			// 获取文章列表
-			getArticleDetail: function () {
-				api_article.showArticle({
-					id: this.articleId,
-				}).then(res => {
-					if(res.data.code === 200) {
-						var d = res.data.data;
-						this.articleDetail = d;
-					}
-				})
-			}
+			this.$store.dispatch('getArticleDetail', {
+				id: this.$route.params.id
+			})
 		}
 	}
 </script>

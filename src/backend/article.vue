@@ -2,19 +2,19 @@
 	<div class="main-panel">
 		<el-breadcrumb separator="/" class="breadcrumb mb25">
 			<el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-			<el-breadcrumb-item :to="{ path: '/category' }">文章管理</el-breadcrumb-item>
+			<el-breadcrumb-item :to="{ path: '/article' }">文章管理</el-breadcrumb-item>
 			<el-breadcrumb-item>文章列表</el-breadcrumb-item>
 		</el-breadcrumb>
 		<div class="main-content">
 			{{$store.state.num}}
-			<el-table :data="tableData" border style="width: 100%" class="table-align-center">
+			<el-table :data="articleList.list" border style="width: 100%" class="table-align-center">
 				<el-table-column prop="id" label="#" width="50"></el-table-column>
 				<el-table-column prop="title" label="文章标题"></el-table-column>
-				<el-table-column label="文章封面" class-name="item-icon">
+<!-- 				<el-table-column label="文章封面" class-name="item-icon">
 					<template slot-scope="scope">
 						<img :src="scope.row.cover">
 					</template>
-				</el-table-column>
+				</el-table-column> -->
 				<el-table-column prop="username" label="作者" width="200"></el-table-column>
 				<el-table-column prop="comment_num" label="评论数" width="100"></el-table-column>
 				<!-- <el-table-column prop="updated_at" label="最后编辑时间"></el-table-column> -->
@@ -26,15 +26,15 @@
 					</template>
 				</el-table-column>
 			</el-table>
-			<div class="ss-page mt10" v-if="tableData.length">
+			<div class="ss-page mt10" v-if="articleList.totalCount">
 				<el-pagination
 					@size-change="handleSizeChange"
 					@current-change="handleCurrentChange"
-					:current-page="currentPage"
+					:current-page="articleList.currentPage"
 					:page-sizes="[5, 10, 20, 50, 100]"
-					:page-size="pageSize"
+					:page-size="articleList.pageSize"
 					layout="total, sizes, prev, pager, next, jumper"
-					:total="totalCount">
+					:total="articleList.totalCount">
 				</el-pagination>
 			</div>
 		</div>
@@ -44,12 +44,7 @@
 	import { mapState } from 'vuex'
 	export default {
 		computed: {
-			...mapState({
-				tableData: state => state.article.list,
-				currentPage: state => state.article.currentPage,
-				pageSize: state => state.article.pageSize,
-				totalCount: state => state.article.totalCount,
-			})
+			...mapState(['articleList', 'user']),
 		},
 
 		created(){
@@ -64,7 +59,7 @@
 
 			// 更改每页显示条数
 			handleSizeChange(val) {
-				this.$store.commit('saveArticle', {
+				this.$store.commit('saveArticleList', {
 					currentPage: 1,
 					pageSize: val
 				})
@@ -73,7 +68,7 @@
 
 			// 选择页数
 			handleCurrentChange(val) {
-				this.$store.commit('saveArticle', {
+				this.$store.commit('saveArticleList', {
 					currentPage: val
 				})
 				this.getArticleList()
@@ -81,12 +76,16 @@
 
 			// 查看详情
 			handleShow: function (index, id) {
-				this.$router.push({ name: 'articleDetail', params: { id: id }})
+				this.$router.push('articleDetail/'+id)
 			},
 
 			// 编辑
 			handleEdit: function (index, row) {
-
+				if(row.user_id === this.user.id || this.user.id === 0) {
+					this.$router.push('articleEdit/update/'+row.id)
+				} else {
+					this.$message.error('你没有编辑权限')
+				}
 			},
 
 			// 删除
@@ -96,6 +95,19 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
+					this.$store.dispatch('deleteArticle', { id: row.id }).then(res => {
+						if(res.code === 200) {
+							this.$message.success(res.msg)
+							if(this.articleList.list.length === 1) {
+								this.$store.commit('saveArticleList', {
+									currentPage: this.articleList.currentPage - 1
+								})
+							}
+							this.getArticleList()
+						} else {
+							this.$message.error(res.msg)
+						}
+					})
 				})
 			}
 		}

@@ -12,6 +12,23 @@ const passport = {
 			method: 'post',
 			params: data
 		})
+	},
+
+	// 登出
+	logout: () => {
+		return axios({
+			url: '/api/passport/logout',
+			method: 'get',
+		})
+	},
+
+	// 检查是否登录
+	checkLogin: () => {
+		return axios({
+			url: '/api/passport/checkLogin',
+			withCredentials: true,
+			method: 'get'
+		})
 	}
 }
 

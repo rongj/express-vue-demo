@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 var compression = require('compression');
 
-var config = require('./db/config');
+var redisConfig = require('./db/config').redis;
 
 var index = require('./routes/web');
 var api = require('./routes/api');
@@ -22,7 +22,7 @@ app.set('view engine', 'ejs');
 
 // cors跨域处理
 app.use(cors({
-	origin: ['http://localhost', 'http://localhost:8088', /\.mop\.com$/],
+	origin: ['http://localhost', 'http://localhost:8088', /\.nodepy\.com$/],
 	credentials: true
 }));
 
@@ -45,13 +45,13 @@ app.use(session({
 	secret: 'session-app', // 对session id 相关的cookie 进行签名
 	resave: true,
 	store: new RedisStore({
-		host: config.redis.host,
-		port: config.redis.port,
+		host: redisConfig.host,
+		port: redisConfig.port,
+		password: redisConfig.password,
 		db: 1
 	}),
 	saveUninitialized: false, // 是否保存未初始化的会话
 	cookie: {
-		domain: 'localhost',
 		maxAge : 1000 * 60 * 10, // 设置 session 的有效时间，单位毫秒
 	},
 }));

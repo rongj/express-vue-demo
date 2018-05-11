@@ -42,7 +42,7 @@ module.exports = {
 			if (results) {
 				if(results.length && encrypt(password) === results[0].password) {
 					let { id, username } = results[0];
-					req.session.username = username;
+					req.session.user = { id, username };
 					return jsonWrite(res, 200, { id, username });
 				} else {
 					return jsonWrite(res, 400, '账号或密码错误');
@@ -55,20 +55,20 @@ module.exports = {
 
 	// 检测是否登录
 	checkLogin: function (req, res, next) {
-		if(req.session.username) {
-			return jsonWrite(res, 200, '已登录');
+		if(req.session.user) {
+			return jsonWrite(res, 200, req.session.user);
 		} else {
-			return jsonWrite(res, 200, '未登录');
+			return jsonWrite(res, 201, '未登录');
 		}
 	},
 
 	// 登出
 	logout: function (req, res, next) {
-		req.session.username = null;
-		if(!req.session.username) {
+		req.session.user = null;
+		if(!req.session.user) {
 			return jsonWrite(res, 200, '退出登录成功');
 		} else {
-			return jsonWrite(res, 200, '退出登录失败');
+			return jsonWrite(res, 201, '退出登录失败');
 		}
 	},
 

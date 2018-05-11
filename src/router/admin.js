@@ -37,15 +37,16 @@ export default new Router({
 					name: 'articleDetail',
 				},
 				{
-					path: 'addarticle',
-					component: () => import('../backend/addarticle.vue'),
-					name: 'addarticle',
+					path: 'articleEdit/:type/:id?',
+					component: () => import('../backend/articleEdit.vue'),
+					name: 'articleEdit',
 				},
 			]
 		},
 		{
 			path: '/login',
-			component: () => import('../backend/login.vue')
+			component: () => import('../backend/login.vue'),
+			name: 'login'
 		},
 		{
 			path: '*',

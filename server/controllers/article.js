@@ -7,14 +7,14 @@ module.exports = {
 	createArticle: function (req, res, next) {
 		var params = reqData(req);
 		if(!params.title || !params.content) {
-			jsonWrite(res, 400)
+			return jsonWrite(res, 400)
 		}
-		var sql = `insert into articles (title, content) values (?,?)`;
-		pool.queryArgs(sql, [params.title, params.content] , function (err, results) {
+		var sql = `insert into articles (user_id, title, content, created_at, updated_at) values (?,?,?,?,?)`;
+		pool.queryArgs(sql, [req.session.user.id, params.title, params.content, new Date(), new Date()] , function (err, results) {
 			if (results) {
-				jsonWrite(res, 200, params)
+				return jsonWrite(res, 200, {id: results.insertId, ...params})
 			} else {
-				jsonWrite(res, 201, err)
+				return jsonWrite(res, 201, err)
 			}
 		})
 	},
@@ -22,13 +22,39 @@ module.exports = {
 	// 删
 	deleteArticle: function (req, res, next) {
 		var id = req.params.id;
+		var sql_article = `select user_id from articles where id = ${id}`;
 		var sql = `delete from articles where id = ${id}`;
-		pool.query(sql, function (err, results) {
-			if (results) {
-				jsonWrite(res, 200)
-			} else {
-				jsonWrite(res, 201, err)
+
+		async.waterfall([
+			// 查看文章用户与登录用户是否一致
+			function (cb) {
+				pool.query(sql_article, function (err, results) {
+					if(results && results.length) {
+						if(results[0].user_id === req.session.user.id) {
+							cb(null)
+						} else {
+							cb('你没有权限')
+						}
+					}
+				})
+			},
+
+			// 删除文章
+			function (cb) {
+				pool.query(sql, function (err, results) {
+					if(results) {
+						cb(null, results)
+					} else {
+						cb(err)
+					}
+				})
 			}
+		], function (err, results) {
+				if (results) {
+					jsonWrite(res, 200, '删除成功')
+				} else {
+					jsonWrite(res, 201, err)
+				}
 		})
 	},
 
@@ -36,17 +62,48 @@ module.exports = {
 	updateArticle: function (req, res, next) {
 		var id = req.params.id;
 		var params = reqData(req);
+
 		if(!id || !params.title || !params.content) {
-			jsonWrite(res, 400)
+			return jsonWrite(res, 400)
 		}
-		var sql = `update articles set title = "${params.title}", content = "${params.content}" where id = ${id}`;
-		pool.query(sql, function (err, results) {
-			if (results) {
-				jsonWrite(res, 200)
-			} else {
-				jsonWrite(res, 201, err)
+
+		var sql_article = `select user_id from articles where id = ${id}`;
+		var sql = `update articles set title = "${params.title}", content = "${params.content}", updated_at = ? where id = ${id}`;
+
+		async.waterfall([
+			// 查看文章用户与登录用户是否一致
+			function (cb) {
+				pool.query(sql_article, function (err, results) {
+					if(results && results.length) {
+						if(results[0].user_id === req.session.user.id) {
+							cb(null)
+						} else {
+							cb('你没有权限')
+						}
+					}
+				})
+			},
+
+			// 删除文章
+			function (cb) {
+				pool.queryArgs(sql, [new Date()], function (err, results) {
+					if(results) {
+						cb(null, results)
+					} else {
+						cb(err)
+					}
+				})
 			}
+		], function (err, results) {
+				if (results) {
+					jsonWrite(res, 200, '修改成功')
+				} else {
+					jsonWrite(res, 201, err)
+				}
 		})
+
+
+
 	},
 
 	// 查
@@ -55,7 +112,7 @@ module.exports = {
 		if(!id) {
 			jsonWrite(res, 400)
 		}
-		var sql = `select articles.title, content, users.username from articles
+		var sql = `select articles.id, title, content, users.username from articles
 				join users
 				on articles.user_id = users.id
 				where articles.id = ${id}`;
@@ -86,11 +143,12 @@ module.exports = {
 		// 	limit ${pageSize*(pageNum-1)}, ${pageSize}`
 
 		// 多表联查
-		var sql = `select articles.id, title, content, users.username, ifnull(new_cs.comment_num, 0) as comment_num from articles
+		var sql = `select articles.id, user_id, title, content, users.username, ifnull(new_cs.comment_num, 0) as comment_num from articles
 				join users
 				on articles.user_id = users.id
 				left join (select article_id, count(c_content) as comment_num from comments GROUP BY article_id) as new_cs
 				on articles.id = new_cs.article_id
+				order by id
 				limit ${pageSize*(pageNum-1)}, ${pageSize}`
 
 		var sql_comment = `select comments.id, comments.c_content, users.username from comments 
@@ -104,12 +162,12 @@ module.exports = {
 		*/
 		async.auto({
 			// 获取页数
-			totalPage: function(cb) {
+			pageInfo: function(cb) {
 				pool.query(`select count(*) as sum from articles`, function (err, results) {
 					if(results) {
 						var totalCount = results[0].sum
 						var totalPage = Math.ceil(totalCount/pageSize) 
- 						cb(null, totalPage)
+ 						cb(null, { totalPage, totalCount })
 					}
 				})
 			},

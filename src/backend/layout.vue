@@ -7,10 +7,10 @@
 			<div class="header-menu fr">
 				<el-menu background-color="#324157" text-color="#fff" active-text-color="#fff" class="el-menu" mode="horizontal">
 					<el-submenu index="1">
-						<template slot="title">管理员</template>
+						<template slot="title">欢迎你，{{user.username}}</template>
 						<el-menu-item index="1-1">修改密码</el-menu-item>
 						<el-menu-item index="1-2">个人信息</el-menu-item>
-						<el-menu-item index="logout">退出</el-menu-item>
+						<el-menu-item index="logout" @click="logout">退出</el-menu-item>
 					</el-submenu>
 					<el-menu-item index="2"><a href="/">网站前台</a></el-menu-item>
 				</el-menu>
@@ -30,7 +30,7 @@
 					<el-submenu index="3">
 						<template slot="title"><i class="el-icon-menu"></i>文章管理</template>
 						<el-menu-item index="/article">文章列表</el-menu-item>
-						<el-menu-item index="/addarticle">添加文章</el-menu-item>
+						<el-menu-item index="/articleEdit/create">添加文章</el-menu-item>
 					</el-submenu>
 				</el-menu>
 			</el-col>
@@ -44,12 +44,32 @@
 </template>
 
 <script>
-	import passport from '../api/passport'
+	import { mapState } from 'vuex'
 
 	export default {
 		computed: {
 			defaultActive: function(){
 				return this.$route.path;
+			},
+			...mapState(['user'])
+		},
+		beforeCreate() {
+			this.$store.dispatch('checkLogin').then(res => {
+				if(res.code !== 200) {
+					this.$router.push({ name: 'login', query: { redictUrl: location.href }})
+				}
+			}).catch(e => {})
+		},
+		methods: {
+			logout: function () {
+				this.$store.dispatch('logout').then(res => {
+					if(res.code === 200) {
+						this.$message.success(res.msg)
+						this.$router.push({ name: 'login', query: { redictUrl: location.href }})
+					} else {
+						this.$message.error(res.msg)
+					}
+				})
 			}
 		}
 	}
